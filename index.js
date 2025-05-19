@@ -1,5 +1,8 @@
 const { Client, LocalAuth } = require('wwebjs');
 const qrcode = require('qrcode-terminal');
+const connection = require('./mysql/connection');
+const banco = require('./script/db.js');
+const stages = require('./script/stages.js');
 
 const client = new Client({
   authStrategy: new LocalAuth(),
@@ -27,14 +30,28 @@ client.on('disconnected', (reason) => {
 });
 
 client.on('message', async msg => {
-    if(msg.body === '!ping') {
-        await msg.reply('pong!');
+  try {
+    if (msg._data.id.participant === undefined) {
+      let currentStage = getStage(msg.from);
+      console.log("Stage numero: " + currentStage);
+      let resp = await stages.step[currentStage].obj.execute(msg);
+      client.sendMessage(msg.from, resp)
     }
-
-    if (msg.body === '!info') {
-        await msg.reply(`Bot funcionando todo fudido!\n ${new Date().toDateString()}`)
-    }
+  } catch (e) {
+    console.log(e);
+  }
 });
+
+function getStage(user) {
+  if (banco.db[user]) {
+    return banco.db[user].stage;
+  } else {
+    banco.db[user] = {
+      stage: 0
+    }
+    return banco.db[user].stage;
+  }
+}
 
 
 console.log('🚀 Iniciando cliente WhatsApp...');

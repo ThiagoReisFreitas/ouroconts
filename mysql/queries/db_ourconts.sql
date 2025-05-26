@@ -1,21 +1,32 @@
 USE db_ouroconts;
 
-CREATE TABLE IF NOT EXISTS tb_ouroconts(
-    id SERIAL PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
-    whats VARCHAR(255) NOT NULL,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-
 CREATE TABLE tb_usuario (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
+    stage INTEGER NOT NULL,
     numero_whatsapp VARCHAR(20) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    saldo_atual NUMERIC(10, 2) DEFAULT 0.00,
-    gastos_recorrentes TEXT,
-    investimentos TEXT
+    saldo_atual DECIMAL(10, 2) DEFAULT 0.00,
+);
+
+CREATE TABLE tb_gasto_recorrente (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL,
+    frequencia VARCHAR(20) NOT NULL, -- Ex: 'mensal', 'semanal', 'anual'
+    proximo_vencimento DATE,
+    FOREIGN KEY (usuario_id) REFERENCES tb_usuario(id) ON DELETE CASCADE
+);
+
+CREATE TABLE tb_investimento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL,
+    tipo VARCHAR(50), -- Ex: 'ações', 'tesouro direto'
+    data_aporte DATE NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES tb_usuario(id) ON DELETE CASCADE
 );
 
 CREATE TABLE tb_categoria (
@@ -28,7 +39,7 @@ CREATE TABLE tb_categoria (
 CREATE TABLE tb_comprovante (
     id SERIAL PRIMARY KEY,
     caminho_imagem TEXT,
-    texto_lido TEXT
+    texto_lido LONGTEXT
 );
 
 CREATE TABLE tb_transacao (

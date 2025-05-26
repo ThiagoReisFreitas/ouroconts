@@ -12,6 +12,7 @@ CREATE TABLE tb_usuario (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     numero_whatsapp VARCHAR(20) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
     saldo_atual NUMERIC(10, 2) DEFAULT 0.00,
     gastos_recorrentes TEXT,
     investimentos TEXT
